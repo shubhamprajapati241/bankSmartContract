@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div style="text-align: center;">
+        <h3>Bank on Blockchain</h3>
+        <input type="text" id='amount'>
+        <p id="balance"></p>
+        <button id="deposit">Deposit</button>
+        <button id="withdraw">Withdraw</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.7.4/web3.min.js" integrity="sha512-oMd9Re3VgJcXuZJn9DN6X7S7JUc7xLYZ2UyZ85Mm/xzaW3lwBr4fV2zjuu/n5jY/Of/2JOx35CTa6zvQNxb31Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <script>
+
+        var contract;
+        $(document).ready(function() {
+            
+            web3 = new Web3(web3.currentProvider);
+
+            var address = '0xFc2775f36437025D71Ba423E59c8e51a6269EfD7';
+            var abi = [
+            {
+                "inputs": [],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [],
+                "name": "balance",
+                "outputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "",
+                        "type": "int256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "amt",
+                        "type": "int256"
+                    }
+                ],
+                "name": "deposit",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getBalance",
+                "outputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "",
+                        "type": "int256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "int256",
+                        "name": "amt",
+                        "type": "int256"
+                    }
+                ],
+                "name": "withdraw",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            }
+        ];
+
+        console.log('Create contract...');
+
+            contract = new web3.eth.Contract(abi, address);
+            console.log(contract);
+
+            contract.methods.getBalance().call().then((result) => {
+                $('#balance').html('Current Balance is :'+result);
+            }).catch(function(err){
+                console.log('err...\n'+err);
+            });
+
+            $('#deposit').click(function() {
+                var amt = 0;
+                amt = parseInt($('#amount').val());
+                console.log('Deposit amount : '+amt);
+                web3.eth.requestAccounts().then(function(accounts) {
+                    console.log('account : '+accounts);
+                    var acc = accounts[0];
+                    return contract.methods.deposit(amt).send({from: acc});
+                }).then( function(tx) {
+                    console.log('Deposit Transaction Successful !!!');
+                    console.log(tx);
+                    location.reload(true);
+                }).catch(function(err) {
+                    console.log('err...\n'+err);
+                });
+            });
+
+            $('#withdraw').click(function() {
+                var amt = 0;
+                amt = parseInt($('#amount').val());
+                console.log('Withdraw amount : '+amt);
+                web3.eth.requestAccounts().then(function(accounts) {
+                    console.log('account : '+accounts);
+                    var acc = accounts[0];
+                    return contract.methods.withdraw(amt).send({from: acc});
+                }).then( function(tx) {
+                    console.log('Withdraw Transaction Successful !!!');
+                    console.log(tx);
+                    location.reload(true);
+                }).catch(function(err) {
+                    console.log('err...\n'+err);
+                });
+            });
+
+
+
+            
+            
+        });
+    </script>
+</body>
+</html>
